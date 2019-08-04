@@ -85,7 +85,7 @@ class _BodyState extends State<Body> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
+//        type: BottomNavigationBarType.shifting,
         currentIndex: _currentTab,
         onTap: (index) => setState(() {
               _currentTab = index;

@@ -41,9 +41,9 @@ class _PostPageState extends State<PostPage> {
     if (item.type == '1') {
       int id = int.parse(item.id);
       fetchSeries(id).then(
-        (data) => setState(() {
-              seasons = data;
-            }),
+            (data) => setState(() {
+          seasons = data;
+        }),
       );
     }
 
@@ -101,12 +101,12 @@ class _PostPageState extends State<PostPage> {
       actions: <Widget>[
         Builder(
           builder: (context) => IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () => showSearch(
-                      context: context,
-                      delegate: PostSearchDelegate(),
-                    ),
-              ),
+            icon: Icon(Icons.search),
+            onPressed: () => showSearch(
+              context: context,
+              delegate: PostSearchDelegate(),
+            ),
+          ),
         ),
       ],
     );
@@ -116,18 +116,19 @@ class _PostPageState extends State<PostPage> {
     return Positioned(
       bottom: 0.0,
       child: Wrap(
-          direction: Axis.horizontal,
-          children: genres.map((String item) {
-            return Container(
-              padding: const EdgeInsets.all(5.0),
-              margin: const EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.0),
-                color: Theme.of(context).chipTheme.selectedColor,
-              ),
-              child: Text(item),
-            );
-          }).toList()),
+        direction: Axis.horizontal,
+        children: genres.map((String item) {
+          return Container(
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.all(5.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.0),
+              color: Theme.of(context).chipTheme.selectedColor,
+            ),
+            child: Text(item),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -135,29 +136,29 @@ class _PostPageState extends State<PostPage> {
       PostListItem movie, BuildContext context) {
     return !(movie.type == '1')
         ? Center(
-            child: GestureDetector(
-              onTap: () {
-                final String movieUrl = movie.url.isEmpty
-                    ? movie.url360.isEmpty ? movie.url720 : movie.url360
-                    : movie.url;
-                _launchMoviePlayer(movie.title, movieUrl, movie.srt);
-                // _launchUrl('https://youtu.be/${movie.trailer}');
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .scaffoldBackgroundColor
-                      .withOpacity(0.7),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.play_arrow,
-                  size: 80.0,
-                  color: Theme.of(context).accentColor,
-                ),
-              ),
-            ),
-          )
+      child: GestureDetector(
+        onTap: () {
+          final String movieUrl = movie.url.isEmpty
+              ? movie.url360.isEmpty ? movie.url720 : movie.url360
+              : movie.url;
+          _launchMoviePlayer(movie.title, movieUrl, movie.srt);
+          // _launchUrl('https://youtu.be/${movie.trailer}');
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context)
+                .scaffoldBackgroundColor
+                .withOpacity(0.7),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.play_arrow,
+            size: 80.0,
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+      ),
+    )
         : SizedBox();
   }
 
@@ -182,6 +183,7 @@ class _PostPageState extends State<PostPage> {
 
   SliverList _buildPageContent(
       BuildContext context, PostListItem movie, Post item) {
+    final style = Theme.of(context).textTheme.body1;
     return SliverList(
       delegate: SliverChildListDelegate(
         [
@@ -191,7 +193,7 @@ class _PostPageState extends State<PostPage> {
               children: <Widget>[
                 InfoRow(
                   title: 'Story',
-                  data: movie.story,
+                  child: Text(movie.story, style: style),
                 ),
               ],
             ),
@@ -257,37 +259,84 @@ class _PostPageState extends State<PostPage> {
   }
 
   Padding _buildInfoList(BuildContext context, PostListItem movie) {
+    final style = Theme.of(context).textTheme.body1;
     return Padding(
       padding: const EdgeInsets.only(left: 18.0, right: 18.0),
       child: Column(
         children: <Widget>[
           InfoRow(
             title: 'Year',
-            data: movie.year,
+            child: Text(movie.year, style: style),
           ),
           InfoRow(
             title: 'Category',
-            data: movie.category,
+            child: Text(movie.category, style: style),
           ),
           InfoRow(
             title: 'Genre',
-            data: movie.genre,
+            child: Wrap(
+              direction: Axis.horizontal,
+              children: _splitMovieInfo(movie.genre).map((String item) {
+                return Container(
+                  padding: const EdgeInsets.all(5.0),
+                  margin: const EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: Theme.of(context).chipTheme.selectedColor,
+                  ),
+                  child: Text(item),
+                );
+              }).toList(),),
           ),
           InfoRow(
             title: 'Director',
-            data: movie.director,
+            child: Text(movie.director, style: style),
           ),
           InfoRow(
             title: 'Cast',
-            data: movie.cast,
+            child: Wrap(
+              direction: Axis.horizontal,
+              children: _splitMovieInfo(movie.cast).map((String item) {
+                return Container(
+                  padding: const EdgeInsets.all(5.0),
+                  margin: const EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: Theme.of(context).chipTheme.selectedColor,
+                  ),
+                  child: Text(item),
+                );
+              }).toList(),
+            ),
           ),
           InfoRow(
             title: 'Rated',
-            data: movie.mpr,
+            child: Text(movie.mpr, style: style),
           ),
+          InfoRow(
+            title: 'Views',
+            child: Text(movie.views, style: style),
+          )
         ],
       ),
     );
+  }
+
+  List<String> _splitMovieInfo(String info) {
+    List<String> result = info.split(' / ');
+
+    if (result.last.contains(';')) {
+      final index = result.last.indexOf(';');
+      result.last.replaceRange(index, index + 1, '');
+
+    }
+    if (result.last.contains('&')) {
+      final index = result.last.indexOf('&');
+      result.last = result.last.replaceRange(index, index + 1, ' ');
+    }
+
+
+    return result;
   }
 
   Widget _buildRecommendedRow(BuildContext context, Post item) {
@@ -356,13 +405,13 @@ class InfoRow extends StatelessWidget {
   const InfoRow({
     Key key,
     @required this.title,
-    @required this.data,
+    @required this.child,
     this.bottomPadding = 5.0,
     this.spaceBetween = 8.0,
   }) : super(key: key);
 
   final String title;
-  final String data;
+  final Widget child;
   final double bottomPadding;
   final double spaceBetween;
 
@@ -385,7 +434,7 @@ class InfoRow extends StatelessWidget {
             ),
           ),
           Flexible(
-            child: Text(data, style: Theme.of(context).textTheme.body1),
+            child: child,
           ),
         ],
       ),

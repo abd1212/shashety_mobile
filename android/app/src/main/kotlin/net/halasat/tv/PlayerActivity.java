@@ -1,23 +1,32 @@
 package net.halasat.tv;
 
+import android.animation.LayoutTransition;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Layout;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.mediarouter.app.MediaRouteButton;
 
@@ -62,25 +71,32 @@ public class PlayerActivity extends AppCompatActivity {
     private MediaRouteButton mediaRouteButton;
     private CastContext castContext;
     private String mediaInfoTitle;
-    private ImageView orientation, bottomSheet;
+    private ImageView backArrow, bottomSheet;
     private LinearLayout bottomSheetLayout;
     private BottomSheetBehavior bottomSheetBehavior;
     private TextView changeQuailty, changeFontSize, textSize,exo_duration,exo_position,text_title;
     private OrientationEventListener orientationEventListener;
-    private ImageButton forewordButton, backwardButton;
+    private ImageButton nextButton,prevButton,forewordButton, backwardButton;
     private DefaultTimeBar timeBar;
+    private ConstraintLayout layoutControle;
+    private FrameLayout playButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.video_player);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setOrientationSensor();
+
         // Find view by id
         findView();
         // Fullscreen activity
         hideSystemUI();
         // Setup custom toolbar
         setupActionBar();
-        // Set title
+        simpleExoPlayerView.setControllerShowTimeoutMs(0);
+        simpleExoPlayerView.setControllerHideOnTouch(false);
+        // Set tit
         setMediaInfoTitle(getIntent().getStringExtra("title"));
         // Set videoUrl
         setVideoUri(getIntent().getStringExtra("videoUrl"));
@@ -92,11 +108,11 @@ public class PlayerActivity extends AppCompatActivity {
         // Setup media info for casting
         //setUpMediaInfo();
         //initial full screen mode
-        initFullscreenDialog();
+        /*initFullscreenDialog();
         initFullscreenButton();
         if (mExoPlayerFullscreen) {
             mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.ic_fullscreen_shrink));
-        }
+        }*/
 
 
         //set bottom sheet
@@ -121,6 +137,10 @@ public class PlayerActivity extends AppCompatActivity {
                 // set the peek height
                 bottomSheetBehavior.setPeekHeight(150);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+               /* LayoutTransition layoutTransition=new LayoutTransition();
+                bottomSheetLayout.setLayoutTransition(layoutTransition);*/
+                Animation animSlideDown = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slid_up);
+                bottomSheetLayout.startAnimation(animSlideDown);
 
                 // set hideable or not
                 bottomSheetBehavior.setHideable(false);
@@ -148,6 +168,7 @@ public class PlayerActivity extends AppCompatActivity {
                                             /* onDismissListener= */ dismissedDialog -> isShowingTrackSelectionDialog = false);
                             trackSelectionDialog.show(getSupportFragmentManager(), /* tag= */ null);
 
+
                         }
                     }
                 });
@@ -155,42 +176,14 @@ public class PlayerActivity extends AppCompatActivity {
         });
 
 
+
+
         // set orientation listener
-        setOrientationSensor();
-        orientation.setOnClickListener(new View.OnClickListener() {
+        backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
 
             public void onClick(View view) {
-                ImageView imageView = (ImageView) view;
-                assert (R.id.orientation == imageView.getId());
-
-                // See here
-                Integer integer = (Integer) imageView.getTag();
-                integer = integer == null ? 0 : integer;
-
-                switch (integer) {
-                    case R.drawable.ic_mobile_orientation:
-                        imageView.setImageDrawable(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.ic_lock_orientation));
-                        imageView.setTag(R.drawable.ic_lock_orientation);
-                        int o = getResources().getConfiguration().orientation;
-                        if (o == Configuration.ORIENTATION_LANDSCAPE) {
-                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                            orientationEventListener.disable();
-
-                        } else if (o == Configuration.ORIENTATION_PORTRAIT) {
-                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                            orientationEventListener.disable();
-
-                        }
-                        break;
-                    case R.drawable.ic_lock_orientation:
-                    default:
-                        imageView.setImageDrawable(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.ic_mobile_orientation));
-                        imageView.setTag(R.drawable.ic_mobile_orientation);
-                        orientationEventListener.enable();
-                        break;
-                }
-
+                finish();
 
             }
         });
@@ -200,13 +193,63 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+
+    private void changeFontSize() {
+        bottomSheetLayout.setVisibility(View.VISIBLE);
+        // set the peek height
+        bottomSheetBehavior.setPeekHeight(150);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+        Animation animSlideDown = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slid_up);
+        bottomSheetLayout.startAnimation(animSlideDown);
+        // set hideable or not
+        bottomSheetBehavior.setHideable(false);
+        textSize.setText("Large");
+        textSize.setVisibility(View.VISIBLE);
+        textSize.setTextSize(15);
+        changeFontSize.setTextSize(15);
+        changeQuailty.setTextSize(15);
+        changeQuailty.setText("Small");
+        changeQuailty.setCompoundDrawables(null, null, null, null);
+        changeFontSize.setText("Medium");
+        changeFontSize.setCompoundDrawables(null, null, null, null);
+        changeQuailty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSubtitleStyle(1);
+                bottomSheetLayout.setVisibility(View.GONE);
+            }
+        });
+        changeFontSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSubtitleStyle(2);
+                bottomSheetLayout.setVisibility(View.GONE);
+            }
+        });
+        textSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeSubtitleStyle(3);
+                bottomSheetLayout.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
     private void setOrientationSensor() {
         orientationEventListener = new OrientationEventListener(PlayerActivity.this) {
             @Override
             public void onOrientationChanged(int orientation) {
-                if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                if (orientation ==90 && orientation== 270) {
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+                    hideSystemUI();
+                }
+                else
+                {
+                    PlayerActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+                    hideSystemUI();
                 }
                 int epsilon = 10;
                 int leftLandscape = 90;
@@ -243,8 +286,12 @@ public class PlayerActivity extends AppCompatActivity {
         );
 
         //  Create the player
+       /* player = ExoPlayerFactory.
+                newSimpleInstance(this, trackSelector, loadControl);*/
+
         player = ExoPlayerFactory.
                 newSimpleInstance(this, trackSelector, loadControl);
+
 
 
         // Produces DataSource instances through which media data is loaded.
@@ -271,12 +318,19 @@ public class PlayerActivity extends AppCompatActivity {
         simpleExoPlayerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 if (mToolbar.getVisibility() == View.VISIBLE) {
-                    mToolbar.setVisibility(View.GONE);
+                    mToolbar.setVisibility(View.INVISIBLE);
+                    layoutControle.setVisibility(View.INVISIBLE);
                 } else if (mToolbar.getVisibility() == View.GONE || mToolbar.getVisibility() == View.INVISIBLE) {
                     mToolbar.setVisibility(View.VISIBLE);
+                    layoutControle.setVisibility(View.VISIBLE);
+                    //delayApp_bar();
                 }
                 if (bottomSheetLayout.getVisibility() == View.VISIBLE) {
+                    Animation animSlideDown = AnimationUtils.loadAnimation(PlayerActivity.this,R.anim.slid_down);
+                    bottomSheetLayout.startAnimation(animSlideDown);
                     bottomSheetLayout.setVisibility(View.GONE);
                 }
                 hideSystemUI();
@@ -289,54 +343,35 @@ public class PlayerActivity extends AppCompatActivity {
         player.addListener(new PlayerEventListener());
     }
 
+
+    public void delayApp_bar(){
+        final Handler handler = new Handler();
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mToolbar.setVisibility(View.INVISIBLE);
+                layoutControle.setVisibility(View.INVISIBLE);
+            }
+        }, 5000);
+
+    }
+
+
+
+
+
     @Override
     protected void onPause() {
         super.onPause();
         //If Exo is ready, passing false you will pause the player
         player.setPlayWhenReady(false);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
     }
 
 
-    private void changeFontSize() {
-        bottomSheetLayout.setVisibility(View.VISIBLE);
-        // set the peek height
-        bottomSheetBehavior.setPeekHeight(150);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-        // set hideable or not
-        bottomSheetBehavior.setHideable(false);
-        textSize.setText("Large");
-        textSize.setVisibility(View.VISIBLE);
-        textSize.setTextSize(15);
-        changeFontSize.setTextSize(15);
-        changeQuailty.setTextSize(15);
-        changeQuailty.setText("small");
-        changeQuailty.setCompoundDrawables(null, null, null, null);
-        changeFontSize.setText("medium");
-        changeFontSize.setCompoundDrawables(null, null, null, null);
-        changeQuailty.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeSubtitleStyle(1);
-                bottomSheetLayout.setVisibility(View.GONE);
-            }
-        });
-        changeFontSize.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeSubtitleStyle(2);
-                bottomSheetLayout.setVisibility(View.GONE);
-            }
-        });
-        textSize.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeSubtitleStyle(3);
-                bottomSheetLayout.setVisibility(View.GONE);
-            }
-        });
 
-    }
 
     private void setUpCasting() {
 
@@ -420,7 +455,7 @@ public class PlayerActivity extends AppCompatActivity {
             mToolbar.setVisibility(View.GONE);
             hideSystemUI();
             // Hide status bar
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 // Show status bar
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -453,7 +488,7 @@ public class PlayerActivity extends AppCompatActivity {
         mToolbar.setVisibility(View.VISIBLE);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
 
 
     }
@@ -464,31 +499,38 @@ public class PlayerActivity extends AppCompatActivity {
         text_title=mToolbar.findViewById(R.id.text_title);
 
         PlaybackControlView controlView = simpleExoPlayerView.findViewById(R.id.exo_controller);
-        mFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
-        orientation = mToolbar.findViewById(R.id.orientation);
+        //mFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
+        backArrow = mToolbar.findViewById(R.id.backarrow);
         bottomSheet = mToolbar.findViewById(R.id.bottom_sheet);
         bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
         changeFontSize = findViewById(R.id.change_font_size);
         changeQuailty = findViewById(R.id.change_quality);
         textSize = findViewById(R.id.text_size);
+        layoutControle=controlView.findViewById(R.id.controlLayout);
+        //playButton=findViewById(R.id.playButton);
         forewordButton=controlView.findViewById(R.id.exo_ffwd);
         backwardButton=controlView.findViewById(R.id.exo_rew);
+        //nextButton=controlView.findViewById(R.id.exo_next);
+        //prevButton=controlView.findViewById(R.id.exo_prev);
         timeBar=controlView.findViewById(R.id.exo_progress);
         exo_duration=controlView.findViewById(R.id.exo_duration);
         exo_position=controlView.findViewById(R.id.exo_position);
         mediaRouteButton =  mToolbar.findViewById(R.id.media_route_button);
         //titleText=mToolbar.findViewById(R.id.title_text);
-
+//        ViewGroup viewGroup= (ViewGroup) layoutControle.getParent();
+//        View myButtonPlay= getLayoutInflater().inflate(R.layout.button_play, viewGroup, false);
+//        viewGroup.removeView(layoutControle);
+//        viewGroup.addView(myButtonPlay);
     }
 
     //initial full screen mode
-    private void initFullscreenDialog() {
+    /*private void initFullscreenDialog() {
 
         if (mExoPlayerFullscreen)
             closeFullscreenDialog();
 
 
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -496,10 +538,14 @@ public class PlayerActivity extends AppCompatActivity {
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
 
     }
 
-    private void openFullscreenDialog() {
+
+
+    /*private void openFullscreenDialog() {
         mFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(PlayerActivity.this, R.drawable.ic_fullscreen_shrink));
         mExoPlayerFullscreen = true;
         hideSystemUI();
@@ -536,7 +582,7 @@ public class PlayerActivity extends AppCompatActivity {
                     closeFullscreenDialog();
             }
         });
-    }
+    }*/
 
     private void changeSubtitleStyle(int fontSize) {
         //FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(30, 30);
@@ -569,13 +615,20 @@ public class PlayerActivity extends AppCompatActivity {
     }
     // Hide controller button for TV use
     public void hideController(){
+        // layoutControle.setVisibility(View.GONE);
+        // playButton.setVisibility(View.VISIBLE);
+        exo_position.setVisibility(View.INVISIBLE);
         forewordButton.setImageDrawable(null);
+        forewordButton.setBackground(null);
+        forewordButton.setVisibility(View.GONE);
         backwardButton.setImageDrawable(null);
-        backwardButton.setEnabled(false);
-        forewordButton.setEnabled(false);
-        exo_position.setVisibility(View.GONE);
+        backwardButton.setBackground(null);
+        backwardButton.setVisibility(View.GONE);
+        //nextButton.setImageDrawable(null);
+        //prevButton.setImageDrawable(null);
         exo_duration.setVisibility(View.GONE);
         timeBar.setEnabled(false);
+        timeBar.setVisibility(View.GONE);
         timeBar.setAdMarkerColor(Color.BLACK);
         timeBar.setBufferedColor(Color.BLACK);
         timeBar.setPlayedColor(Color.BLACK);
