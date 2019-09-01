@@ -19,6 +19,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,6 +96,7 @@ public final class TrackSelectionDialog extends DialogFragment {
                 Assertions.checkNotNull(trackSelector.getCurrentMappedTrackInfo());
         TrackSelectionDialog trackSelectionDialog = new TrackSelectionDialog();
         DefaultTrackSelector.Parameters parameters = trackSelector.getParameters();
+        Log.d("infooooo",parameters.toString());
         trackSelectionDialog.init(
                 /* titleId= */ R.string.track_selection_title,
                 mappedTrackInfo,
@@ -180,6 +182,7 @@ public final class TrackSelectionDialog extends DialogFragment {
             if (showTabForRenderer(mappedTrackInfo, i)) {
                 int trackType = mappedTrackInfo.getRendererType(/* rendererIndex= */ i);
                 TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+                Log.d("trackGroups", trackGroupArray.toString());
                 TrackSelectionViewFragment tabFragment = new TrackSelectionViewFragment();
                 tabFragment.init(
                         mappedTrackInfo,

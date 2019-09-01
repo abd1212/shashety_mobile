@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:shashety_mobile/src/services/categories.dart';
 
 import '../models/account.dart';
 import '../models/home_page_movies.dart';
@@ -19,7 +18,6 @@ import '../models/post.dart';
 import '../pages/post_page.dart';
 import '../services/post.dart';
 import '../widgets/post_row.dart';
-import 'category.dart';
 import 'tv.dart';
 import 'login.dart';
 import '../widgets/network_error.dart';
@@ -78,19 +76,19 @@ class _BodyState extends State<Body> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () => showSearch(
-                  context: context,
-                  delegate: PostSearchDelegate(),
-                ),
+              context: context,
+              delegate: PostSearchDelegate(),
+            ),
           )
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
+//        type: BottomNavigationBarType.shifting,
         currentIndex: _currentTab,
         onTap: (index) => setState(() {
-              _currentTab = index;
-              // _appBarColor = _colors[index];
-            }),
+          _currentTab = index;
+          // _appBarColor = _colors[index];
+        }),
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.movie),
@@ -114,92 +112,58 @@ class _BodyState extends State<Body> {
           child: ScopedModelDescendant<AccountModel>(
             builder: (BuildContext context, Widget _, AccountModel account) {
               return account.status == AccountStatus.signedIn
-                  ? ListView(
-                      children: [
-                        SizedBox(height: 10.0),
-                        Align(
-                          child: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(account.user.photoUrl),
-                            radius: 40.0,
-                          ),
-                        ),
-                        SizedBox(height: 5.0),
-                        Text(
-                          account.user.displayName,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .subtitle
-                              .copyWith(fontSize: 20.0),
-                        ),
-                        SizedBox(height: 5.0),
-                        Text(
-                          account.user.email,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .subhead
-                              .copyWith(fontSize: 20.0),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 5.0),
-                          child: OutlineButton(
-                            textColor: Colors.red,
-                            highlightedBorderColor: Colors.red,
-                            child: Text('LOGOUT'),
-                            onPressed: () async {
-                              await _auth.signOut();
-                              account.status = AccountStatus.signedOut;
-                            },
-                          ),
-                        ),
-                        Divider(),
-                        SizedBox(height: 5.0),
-                        FutureBuilder(
-                          future: fetchCategories(),
-                          builder: (context,
-                              AsyncSnapshot<List<Category>> snapshot) {
-                            if (snapshot.hasData) {
-                              return _buildCategoryList(context, snapshot.data);
-                            }
-                            return SizedBox();
-                          },
-                        )
-                      ],
-                    )
+                  ? Column(
+                children: [
+                  SizedBox(height: 10.0),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(account.user.photoUrl),
+                    radius: 40.0,
+                  ),
+                  SizedBox(height: 5.0),
+                  Text(
+                    account.user.displayName,
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle
+                        .copyWith(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 5.0),
+                  Text(
+                    account.user.email,
+                    style: Theme.of(context)
+                        .textTheme
+                        .subhead
+                        .copyWith(fontSize: 20.0),
+                  ),
+                  SizedBox(height: 5.0),
+                  OutlineButton(
+                    highlightedBorderColor: Colors.red,
+                    // icon: Icon(Icons.exit_to_app),
+                    child: Text('LOGOUT'),
+                    onPressed: () {
+                      _auth.signOut().then((void v) {
+                        account.status = AccountStatus.signedOut;
+                      });
+                    },
+                  ),
+                ],
+              )
                   : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Login to View Your Profile',
-                          style: Theme.of(context)
-                              .textTheme
-                              .subhead
-                              .copyWith(fontSize: 20.0),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: RaisedButton(
-                            color: Colors.indigo,
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                'LOGIN',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _currentTab = 2;
-                                Navigator.of(context).pop();
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    );
+                children: [
+                  RaisedButton(
+
+                    color: Colors.indigo,
+                    // icon: Icon(Icons.exit_to_app),
+                    child: Text('LOGIN'),
+                    onPressed: () {
+                      setState(() {
+                        _currentTab = 2;
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  ),
+                ],
+              );
             },
           ),
         ),
@@ -207,25 +171,6 @@ class _BodyState extends State<Body> {
       body: IndexedStack(index: _currentTab, children: _tabs),
     );
   }
-
-  Widget _buildCategoryList(context, List<Category> cats) => Container(
-        // height: double.infinity,
-        child: Column(
-          children: cats
-              .map((item) => ListTile(
-                    title: Text(item.title, style: Theme.of(context).textTheme.subtitle.copyWith(fontWeight: FontWeight.bold)),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) {
-                          return CategoryPage(
-                              category: int.parse(item.id), title: item.title);
-                        }),
-                      );
-                    },
-                  ))
-              .toList(),
-        ),
-      );
 
   Widget _createPageStorage(Widget widget) =>
       PageStorage(bucket: bucket, child: widget);
@@ -253,11 +198,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return _hasError != null
         ? !_hasError
-            ? ListView(children: [
-                _buildCarouselSlider(context),
-                _buildCategories(context),
-              ])
-            : buildNetworkError(context, _getMovies)
+        ? ListView(children: [
+      _buildCarouselSlider(context),
+      _buildCategories(context),
+    ])
+        : buildNetworkError(context, _getMovies)
         : ActivityIndicator();
   }
 
@@ -282,8 +227,8 @@ class _HomePageState extends State<HomePage> {
         PageStorage.of(context)
             .writeState(context, _homePageMovies, identifier: 'homepagemovies');
       }).catchError((error) => setState(() {
-            _hasError = true;
-          }));
+        _hasError = true;
+      }));
     }
   }
 
@@ -294,18 +239,18 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: featured != null
           ? CarouselSlider(
-              autoPlay: true,
-              height: 200.0,
-              items: featured.featured.map(
-                (FeaturedItem item) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return _buildFeaturedPost(context, item);
-                    },
-                  );
-                },
-              ).toList(),
-            )
+        autoPlay: true,
+        height: 200.0,
+        items: featured.featured.map(
+              (FeaturedItem item) {
+            return Builder(
+              builder: (BuildContext context) {
+                return _buildFeaturedPost(context, item);
+              },
+            );
+          },
+        ).toList(),
+      )
           : SizedBox(),
     );
   }
@@ -365,20 +310,20 @@ class _HomePageState extends State<HomePage> {
     final categories = _homePageMovies.categories;
     return categories != null
         ? Column(
-            children: categories
-                .where((Category item) {
-                  return item.id != '13';
-                })
-                .map<Widget>(
-                  (Category category) => PostRow(
-                        title: category.title,
-                        titleBorderColor: Theme.of(context).accentColor,
-                        data: _homePageMovies.movies[category.title],
-                        category: int.parse(category.id),
-                      ),
-                )
-                .toList(),
-          )
+      children: categories
+          .where((Category item) {
+        return item.id != '13';
+      })
+          .map<Widget>(
+            (Category category) => PostRow(
+          title: category.title,
+          titleBorderColor: Theme.of(context).accentColor,
+          data: _homePageMovies.movies[category.title],
+          category: int.parse(category.id),
+        ),
+      )
+          .toList(),
+    )
         : SizedBox();
   }
 }
