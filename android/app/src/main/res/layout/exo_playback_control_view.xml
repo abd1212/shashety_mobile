@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<<<<<<< HEAD
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+=======
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+>>>>>>> origin/master
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/controlLayout"
@@ -9,6 +14,7 @@
     android:layoutDirection="ltr"
     android:orientation="vertical"
     android:padding="8dp"
+<<<<<<< HEAD
     tools:targetApi="28">
 
     <LinearLayout
@@ -28,21 +34,68 @@
             android:layout_margin="40dp"
             android:background="@drawable/ellipse_shape"
             android:padding="8dp" />
+=======
+    android:id="@+id/controlLayout"
+    tools:targetApi="28">
+
+
+    >
+
+
+    <ImageButton
+        android:id="@id/exo_rew"
+        style="@style/ExoMediaButton.Rewind"
+
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="156dp"
+        android:background="@drawable/ellipse_shape"
+        app:layout_constraintBottom_toTopOf="@+id/layoutProgress"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+        app:layout_constraintHorizontal_bias="0.604"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutProgress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+>>>>>>> origin/master
 
 
         <ImageButton
             android:id="@id/exo_play"
             style="@style/ExoMediaButton.Play"
+<<<<<<< HEAD
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_margin="40dp"
             android:background="@drawable/ellipse_shape"
             android:padding="8dp" />
+=======
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ellipse_shape" />
+>>>>>>> origin/master
 
         <ImageButton
             android:id="@id/exo_pause"
             style="@style/ExoMediaButton.Pause"
+<<<<<<< HEAD
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -59,24 +112,78 @@
             android:layout_margin="40dp"
             android:background="@drawable/ellipse_shape"
             android:padding="8dp" />
+=======
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ellipse_shape" />
+
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@id/exo_ffwd"
+        style="@style/ExoMediaButton.FastForward"
+
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="168dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ellipse_shape"
+        app:layout_constraintBottom_toTopOf="@+id/layoutProgress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.526" />
+
+
+    <androidx.mediarouter.app.MediaRouteButton
+        android:id="@+id/media_route_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:mediaRouteTypes="user"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/layoutProgress"
+        app:layout_constraintEnd_toStartOf="@+id/exo_rew"
+        app:layout_constraintTop_toTopOf="parent" />
+>>>>>>> origin/master
+
 
     <LinearLayout
         android:id="@+id/layoutProgress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:layout_weight="0.7"
         android:gravity="bottom"
         android:orientation="horizontal">
+=======
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+>>>>>>> origin/master
 
         <TextView
             android:id="@id/exo_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:layout_gravity="bottom"
             android:includeFontPadding="false"
             android:padding="6dp"
+=======
+            android:includeFontPadding="false"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+>>>>>>> origin/master
             android:textColor="#FFBEBEBE"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -85,7 +192,10 @@
             android:id="@id/exo_progress"
             android:layout_width="0dp"
             android:layout_height="26dp"
+<<<<<<< HEAD
             android:layout_gravity="bottom"
+=======
+>>>>>>> origin/master
             android:layout_weight="1"
             app:played_color="#F44336" />
 
@@ -93,14 +203,28 @@
             android:id="@id/exo_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:layout_gravity="bottom"
             android:includeFontPadding="false"
             android:padding="6dp"
             android:textColor="#FFBEBEBE"
             android:textSize="14sp"
             android:textStyle="bold" />
+=======
+            android:includeFontPadding="false"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textColor="#FFBEBEBE"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+>>>>>>> origin/master
 
     </LinearLayout>
 
 
+<<<<<<< HEAD
 </LinearLayout>
+=======
+</androidx.constraintlayout.widget.ConstraintLayout>
+>>>>>>> origin/master

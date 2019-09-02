@@ -2,5 +2,9 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android" android:interpolator="@android:anim/linear_interpolator">
 
     <translate android:fromYDelta="0%" android:toYDelta="100%"
+<<<<<<< HEAD
         android:duration="100"/>
+=======
+        android:duration="300"/>
+>>>>>>> origin/master
 </set>
